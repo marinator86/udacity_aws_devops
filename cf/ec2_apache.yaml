@@ -1,0 +1,45 @@
+# call aws cloudformation create-stack  --stack-name challenge1 --region us-east-1 --template-body file://ec2_apache.yaml --parameters file://ec2_apache_params.json
+
+Parameters:
+  myVPCId:
+    Type: AWS::EC2::VPC::Id
+  PublicSubnetId:
+    Type: AWS::EC2::Subnet::Id
+  AMItoUse:
+    Type: String
+AWSTemplateFormatVersion: 2010-09-09
+Description: 'Mario H / Udacity - This template deploys a VPC'
+Resources:
+  SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties: 
+      GroupDescription: Secures the ec2 instance
+      GroupName: ec2_apache
+      SecurityGroupIngress: 
+        - CidrIp: 0.0.0.0/0
+          IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+      VpcId: 
+        Ref: myVPCId
+  ApacheCompute:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: 
+        Ref: AMItoUse
+      InstanceType: t3.micro
+      NetworkInterfaces:
+        - DeviceIndex: 0
+          AssociatePublicIpAddress: true
+          DeleteOnTermination: true
+          SubnetId:
+            Ref: PublicSubnetId
+          GroupSet: 
+            - Ref: SecurityGroup
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          sudo yum update -y
+          sudo yum install -y httpd
+          sudo systemctl start httpd
+          sudo systemctl enable httpd
