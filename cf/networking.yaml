@@ -1,3 +1,4 @@
+# aws cloudformation create-stack --stack-name networking --template-body file://networking.yaml --parameters file://networking_params.json --region us-east-1
 Description: >
   This is a template file that creates a VPC including two AZs, with each AZ having a public and a private subnet.
   This will deploy all necessary networking components, including security groups, routing tables, and NATs.
