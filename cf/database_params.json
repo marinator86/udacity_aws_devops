@@ -1,0 +1,14 @@
+[
+    {
+        "ParameterKey": "EnvironmentName",
+        "ParameterValue": "cf-lesson3"
+    },
+    {
+        "ParameterKey": "dbUser",
+        "ParameterValue": "admin"
+    },
+    {
+        "ParameterKey": "dbPassword",
+        "ParameterValue": "Test123!"
+    }
+]
