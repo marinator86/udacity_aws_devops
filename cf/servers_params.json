@@ -2,5 +2,13 @@
     {
         "ParameterKey": "EnvironmentName",
         "ParameterValue": "cf-lesson3"
+    },
+    {
+        "ParameterKey": "Port",
+        "ParameterValue": "80"
+    },
+    {
+        "ParameterKey": "LBPort",
+        "ParameterValue": "80"
     }
 ]

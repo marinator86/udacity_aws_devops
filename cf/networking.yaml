@@ -173,6 +173,31 @@ Resources:
       RouteTableId: !Ref PublicRouteTable
       SubnetId: !Ref PublicSubnet2
 
+  BastionSecGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow ssh to/from bastion host
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 22
+        ToPort: 22
+        CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+      - IpProtocol: tcp
+        FromPort: 22
+        ToPort: 22
+        CidrIp: 0.0.0.0/0
+  BastionInstance:
+    Type: AWS::EC2::Instance
+    Properties: 
+      ImageId: ami-08e4e35cccc6189f4
+      InstanceType: t2.micro
+      KeyName: default
+      SecurityGroupIds: 
+        - Ref: BastionSecGroup
+      SubnetId: !Ref PublicSubnet1
+
 Outputs:
   VPC:
     Description: A reference to the created or updated VPC
