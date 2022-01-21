@@ -5,6 +5,16 @@ defaults: &defaults
   docker:
     - image: circleci/node:13.8.0
 
+commands:
+  simple_echo:
+    description: echoes a message
+    parameters:
+      msg:
+        type: string
+        default: Hello World!
+    steps:
+      - run: echo << parameters.msg >>
+
 # Use a package of configuration called an orb.
 orbs:
   welcome: circleci/welcome-orb@0.4.1
@@ -23,12 +33,13 @@ jobs:
       - attach_workspace:
           at: /tmp/workspace
       - run: cat /tmp/workspace/output.txt
-  print_url:
+  print_url_with_command:
     <<: *defaults
     environment:
       CIRCLE_COMPARE_URL: << pipeline.project.git_url >>/compare/<< pipeline.git.base_revision >>..<<pipeline.git.revision>>
     steps:
-      - run: echo $CIRCLE_COMPARE_URL
+      - simple_echo:
+          msg: $CIRCLE_COMPARE_URL
 workflows:
   welcome:
     # Run the welcome/run job in its own container
@@ -36,7 +47,7 @@ workflows:
       - welcome/run
   print_env:
     jobs:
-      - print_url
+      - print_url_with_command
   use_workspace:
     jobs:
       - save_output
