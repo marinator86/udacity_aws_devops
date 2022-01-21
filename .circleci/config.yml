@@ -9,10 +9,13 @@ jobs:
     steps:
       - run: echo hello
   print_world:
+    environment:
+      CIRCLE_COMPARE_URL: << pipeline.project.git_url >>/compare/<< pipeline.git.base_revision >>..<<pipeline.git.revision>>
     docker: 
       - image: circleci/node:13.8.0
     steps:
       - run: echo world
+      - run: echo $CIRCLE_COMPARE_URL
 workflows:
   welcome:
     # Run the welcome/run job in its own container
