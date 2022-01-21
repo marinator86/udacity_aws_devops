@@ -1,33 +1,45 @@
 version: 2.1
+
+# anchors
+defaults: &defaults
+  docker:
+    - image: circleci/node:13.8.0
+
 # Use a package of configuration called an orb.
 orbs:
   welcome: circleci/welcome-orb@0.4.1
 jobs:
-  print_hello:
-    docker: 
-      - image: circleci/node:13.8.0
+  save_output:
+    <<: *defaults
     steps:
-      - run: echo hello
-  print_world:
+      - run: echo hello from $CIRCLE_JOB > output.txt
+      - persist_to_workspace:
+          root: .
+          paths:
+            - output.txt
+  read_output:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: /tmp/workspace
+      - run: cat /tmp/workspace/output.txt
+  print_url:
+    <<: *defaults
     environment:
       CIRCLE_COMPARE_URL: << pipeline.project.git_url >>/compare/<< pipeline.git.base_revision >>..<<pipeline.git.revision>>
-    docker: 
-      - image: circleci/node:13.8.0
     steps:
-      - run: echo world
       - run: echo $CIRCLE_COMPARE_URL
 workflows:
   welcome:
     # Run the welcome/run job in its own container
     jobs:
       - welcome/run
-      - print_hello
-      - print_world:
-          requires: 
-           - print_hello
-  print_both:
+  print_env:
     jobs:
-      - print_hello
-      - print_world:
+      - print_url
+  use_workspace:
+    jobs:
+      - save_output
+      - read_output:
           requires: 
-           - print_hello
+           - save_output
