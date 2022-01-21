@@ -11,9 +11,16 @@ commands:
     parameters:
       msg:
         type: string
-        default: Hello World!
+        default: ""
     steps:
-      - run: echo << parameters.msg >>
+      - when:
+          condition: << parameters.msg >>
+          steps:
+            - run: echo non-default << parameters.msg >>
+      - unless:
+          condition: << parameters.msg >>
+          steps:
+            - run: echo default
 
 # Use a package of configuration called an orb.
 orbs:
@@ -38,8 +45,13 @@ jobs:
     environment:
       CIRCLE_COMPARE_URL: << pipeline.project.git_url >>/compare/<< pipeline.git.base_revision >>..<<pipeline.git.revision>>
     steps:
+      - simple_echo
       - simple_echo:
           msg: $CIRCLE_COMPARE_URL
+      - run:
+          name: If this fails, something is done
+          command: echo shice
+          when: on_fail
 workflows:
   welcome:
     # Run the welcome/run job in its own container
