@@ -2,8 +2,29 @@ version: 2.1
 # Use a package of configuration called an orb.
 orbs:
   welcome: circleci/welcome-orb@0.4.1
+jobs:
+  print_hello:
+    docker: 
+      - image: circleci/node:13.8.0
+    steps:
+      - run: echo hello
+  print_world:
+    docker: 
+      - image: circleci/node:13.8.0
+    steps:
+      - run: echo world
 workflows:
   welcome:
     # Run the welcome/run job in its own container
     jobs:
       - welcome/run
+      - print_hello
+      - print_world:
+          requires: 
+           - print_hello
+  print_both:
+    jobs:
+      - print_hello
+      - print_world:
+          requires: 
+           - print_hello
