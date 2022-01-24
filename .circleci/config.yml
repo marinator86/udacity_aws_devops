@@ -2,13 +2,29 @@ version: '2.1'
 orbs:
   aws-cli: circleci/aws-cli@2.0
 jobs:
-  aws-cli-example:
+  aws-cf-template:
     executor: aws-cli/default
     steps:
       - checkout
       - aws-cli/setup
       - run: aws iam list-users
+  ansible:
+    docker:
+      - image: python:3.7-alpine3.11
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints: ["fc:83:bf:ce:04:64:19:c7:e5:43:4e:02:05:78:3d:e3"]
+      - run:
+          name: Install Ansible
+          command: |
+            apk add --update ansible
+      - run:
+          name: Run Playbook and Configure server
+          command: |
+            ansible-playbook -i ansible/ex2/inventory ansible/ex2/main-remote.yml
 workflows:
   aws-cli:
     jobs:
-      - aws-cli-example
+      - aws-cf-template
+      - ansible
