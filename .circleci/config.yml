@@ -8,7 +8,7 @@ jobs:
       - checkout
       - aws-cli/setup
       - run: aws iam list-users
-  ansible:
+  ansible_config_server:
     docker:
       - image: python:3.7-alpine3.11
     steps:
@@ -23,8 +23,27 @@ jobs:
           name: Run Playbook and Configure server
           command: |
             ansible-playbook -i ansible/ex2/inventory ansible/ex2/main-remote.yml
+  smoke_test:
+    docker:
+      - image: alpine:latest
+    steps:
+      - run: apk add --update curl
+      - run:
+          name: smoke test
+          command: |
+            URL="http://3.82.252.104"
+            # Test if website exists
+            if curl -s --head ${URL} 
+            then
+              return 0
+            else
+              return 1
+            fi
 workflows:
   aws-cli:
     jobs:
       - aws-cf-template
-      - ansible
+      - ansible_config_server
+      - smoke_test:
+          requires: 
+            - ansible_config_server
